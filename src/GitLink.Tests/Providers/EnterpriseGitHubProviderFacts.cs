@@ -58,7 +58,7 @@ namespace GitLink.Tests.Providers
 
                 Assert.IsFalse(valid);
 
-                valid = provider.Initialize("https://catenalogic-github.catenalogic.corp/CatenaLogic/GitLink");
+                valid = provider.Initialize(".do not match.");
 
                 Assert.IsTrue(valid);
 
