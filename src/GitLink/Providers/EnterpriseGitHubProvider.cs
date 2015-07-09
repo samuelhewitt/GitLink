@@ -14,7 +14,7 @@ namespace GitLink.Providers
     public class EnterpriseGitHubProvider : GitHubProvider
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
-        private const string _noMatchString = ".do not match.";
+        private const string _noMatchString = @".do not match.\{0}\{1}";
 
         /// <summary>
         /// Loads GitHubRegex and RawGitUrlFormat from app.config.

@@ -58,7 +58,7 @@ namespace GitLink.Tests.Providers
 
                 Assert.IsFalse(valid);
 
-                valid = provider.Initialize(".do not match.");
+                valid = provider.Initialize(".do not match.{0}{1}");
 
                 Assert.IsTrue(valid);
 

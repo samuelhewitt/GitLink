@@ -13,8 +13,8 @@ namespace GitLink.Providers
 
     public class GitHubProvider : ProviderBase
     {
-        protected readonly Regex _gitHubRegex;
-        protected readonly string _rawGitUrlFormat;
+        private readonly Regex _gitHubRegex;
+        private readonly string _rawGitUrlFormat;
 
         public GitHubProvider()
             : this(@"(?<url>(?<companyurl>(?:https://)?github\.com/(?<company>[^/]+))/(?<project>[^/]+))", "https://raw.github.com/{0}/{1}")
