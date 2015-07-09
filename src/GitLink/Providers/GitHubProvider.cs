@@ -13,16 +13,24 @@ namespace GitLink.Providers
 
     public class GitHubProvider : ProviderBase
     {
-        private readonly Regex _gitHubRegex = new Regex(@"(?<url>(?<companyurl>(?:https://)?github\.com/(?<company>[^/]+))/(?<project>[^/]+))");
+        protected readonly Regex _gitHubRegex;
+        protected readonly string _rawGitUrlFormat;
 
-        public GitHubProvider() 
+        public GitHubProvider()
+            : this(@"(?<url>(?<companyurl>(?:https://)?github\.com/(?<company>[^/]+))/(?<project>[^/]+))", "https://raw.github.com/{0}/{1}")
+        {
+        }
+
+        public GitHubProvider(string gitHubRegex, string rawGitUrlFormat)
             : base(new GitPreparer())
         {
+            _gitHubRegex = new Regex(gitHubRegex);
+            _rawGitUrlFormat = rawGitUrlFormat;
         }
 
         public override string RawGitUrl
         {
-            get { return String.Format("https://raw.github.com/{0}/{1}", CompanyName, ProjectName); }
+            get { return String.Format(_rawGitUrlFormat, CompanyName, ProjectName); }
         }
 
         public override bool Initialize(string url)

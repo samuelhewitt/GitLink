@@ -8,72 +8,41 @@
 namespace GitLink.Providers
 {
     using System;
-    using System.Text.RegularExpressions;
-    using GitTools.Git;
     using System.Configuration;
     using Catel.Logging;
 
-    public class EnterpriseGitHubProvider : ProviderBase
+    public class EnterpriseGitHubProvider : GitHubProvider
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
-
-        private readonly Regex _gitHubRegex;
-        private readonly string _rawGitUrlFormat;
+        private const string _noMatchString = ".do not match.";
 
         /// <summary>
-        /// Loads GitHubRegex and RawGitUrlFormat from EnterpriseGitHub.config.
+        /// Loads GitHubRegex and RawGitUrlFormat from app.config.
         /// </summary>
         public EnterpriseGitHubProvider()
-            : base(new GitPreparer())
+            : base(GetAppSetting("gitLink.enterpriseGitHub.gitHubUrlRegex"), GetAppSetting("gitLink.enterpriseGitHub.rawGitUrlFormat"))
         {
+        }
+
+        private static string GetAppSetting(string key)
+        {
+            string value = null;
+
             try
             {
-                var regex = ConfigurationManager.AppSettings["gitLink.enterpriseGitHub.gitHubUrlRegex"];
-                var format = ConfigurationManager.AppSettings["gitLink.enterpriseGitHub.rawGitUrlFormat"];
-
-                _gitHubRegex = new Regex(regex);
-
-                _rawGitUrlFormat = format;
+                value = ConfigurationManager.AppSettings[key];
+                if (String.IsNullOrWhiteSpace(value))
+                {
+                    value = _noMatchString;
+                }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                Log.Info(ex, "EnterpriseGitHubProvider not loaded.");
-                _gitHubRegex = new Regex("enterprise github provider do not match");
-                _rawGitUrlFormat = "{0}/{1}";
-            }
-        }
-
-        public override string RawGitUrl
-        {
-            get { return String.Format(_rawGitUrlFormat, CompanyName, ProjectName); }
-        }
-
-        public override bool Initialize(string url)
-        {
-            var match = _gitHubRegex.Match(url);
-
-            if (!match.Success)
-            {
-                return false;
+                Log.Debug(ex, "EnterpriseGitHubProvider not loaded, appSettings key '" + key + "' not found.");
+                value = _noMatchString;
             }
 
-            CompanyName = match.Groups["company"].Value;
-            CompanyUrl = match.Groups["companyurl"].Value;
-
-            ProjectName = match.Groups["project"].Value;
-            ProjectUrl = match.Groups["url"].Value;
-
-            if (!CompanyUrl.StartsWith("https://", StringComparison.InvariantCultureIgnoreCase))
-            {
-                CompanyUrl = String.Concat("https://", CompanyUrl);
-            }
-
-            if (!ProjectUrl.StartsWith("https://", StringComparison.InvariantCultureIgnoreCase))
-            {
-                ProjectUrl = String.Concat("https://", ProjectUrl);
-            }
-
-            return true;
+            return value;
         }
     }
 }
